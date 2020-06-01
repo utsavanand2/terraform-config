@@ -5,6 +5,7 @@ terraform {
 provider "google" {
     version         = "3.5.0"
 
+    // Replace the file name with the service account credentials you created yourself
     credentials     = file("terraform-svc-acc.json")
 
     project         = "uts-1382"
@@ -35,19 +36,15 @@ data "template_file" "cloud_init" {
     }
 }
 
-resource "google_compute_network" "vpc_network" {
-    name = "default"
-}
-
 resource "google_compute_instance" "vm_instance" {
     name = "faasd-instance"
     machine_type = "f1-micro"
     tags = ["faasd"]
     metadata = {
+        user-data = data.template_file.cloud_init.rendered
         ssh-key = "utsavanand:${data.local_file.ssh_key.filename}"
     }
 
-    metadata_startup_script = data.template_file.cloud_init.rendered
     boot_disk {
         initialize_params {
             image = "debian-cloud/debian-9"
@@ -55,7 +52,7 @@ resource "google_compute_instance" "vm_instance" {
     }
 
     network_interface {
-        network     = google_compute_network.vpc_network.name
+        network     = "default"
         access_config {
             // Include this section to give the VM an external IP address
         }
@@ -71,5 +68,5 @@ output "gateway_url" {
 }
 
 output "login_cmd" {
-    value = "faas-cli login -f http://${google_compute_instance.vm_instance.network_interface.0.access_config.0.nat_ip}:8080/ -p ${random_password.password.result}"
+    value = "faas-cli login -g http://${google_compute_instance.vm_instance.network_interface.0.access_config.0.nat_ip}:8080/ -p ${random_password.password.result}"
 }
