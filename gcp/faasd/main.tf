@@ -36,6 +36,18 @@ data "template_file" "cloud_init" {
     }
 }
 
+resource "google_compute_firewall" "default" {
+    name = "faasd"
+    network = "default"
+
+    allow {
+        protocol = "tcp"
+        ports = ["8080"]
+    }
+    
+    source_tags = ["faasd"]
+}
+
 resource "google_compute_instance" "vm_instance" {
     name = "faasd-instance"
     machine_type = "f1-micro"
@@ -47,7 +59,7 @@ resource "google_compute_instance" "vm_instance" {
 
     boot_disk {
         initialize_params {
-            image = "debian-cloud/debian-9"
+            image = "ubuntu-os-cloud/ubuntu-1804-bionic-v20200529"
         }
     }
 
