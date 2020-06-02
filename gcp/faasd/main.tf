@@ -20,8 +20,7 @@ variable "ssh_key_file" {
 
 resource "random_password" "password" {
     length  = 16
-    special = true
-    override_special = "_-#"
+    special = false
 }
 
 data "local_file" "ssh_key" {
@@ -49,7 +48,7 @@ resource "google_compute_firewall" "default" {
 }
 
 resource "google_compute_instance" "vm_instance" {
-    name = "faasd-instance"
+    name = "faasd"
     machine_type = "f1-micro"
     tags = ["faasd"]
     metadata = {
