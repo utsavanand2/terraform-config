@@ -5,7 +5,7 @@ ssh_authorized_keys:
 package_update: true
 
 packages:
-    - runc
+- runc
 
 runcmd:
 - curl -sLSf https://github.com/containerd/containerd/releases/download/v1.3.4/containerd-1.3.4.linux-amd64.tar.gz -o /tmp/containerd.tar.gz && tar -xvf /tmp/containerd.tar.gz -C /usr/local/bin/ --strip-components=1
@@ -13,13 +13,13 @@ runcmd:
 - systemctl daemon-reload && systemctl start containerd
 - /sbin/sysctl -w net.ipv4.conf.all.forwarding=1
 - mkdir -p /opt/cni/bin
-- curl -sLSf https://github.com/containernetworking/plugins/releases/download/v0.8.6/cni-plugins-linux-amd64-v0.8.6.tgz -o /tmp/cni-plugins-linux-amd64.tgz && tar -xvf /tmp/cni-plugins-linux-amd64.tgz -C /opt/cni/bin
+- curl -sLSf https://github.com/containernetworking/plugins/releases/download/v0.8.6/cni-plugins-linux-amd64-v0.8.6.tgz -o /tmp/cni-plugins-linux-amd64.tgz | tar -xz -C /opt/cni/bin
 - mkdir -p /go/src/github.com/openfaas
 - mkdir -p /var/lib/faasd/secrets
 - echo ${gateway_password} > /var/lib/faasd/secrets/basic-auth-password
 - echo admin > /var/lib/faasd/secrets/basic-auth-user
 - cd /go/src/github.com/openfaas/ && git clone https://github.com/openfaas/faasd
-- curl -sLSf "https://github.com/openfaas/faasd/releases/download/0.8.3/faasd -o "/usr/local/bin/faasd" && chmod a+x "/usr/local/bin/faasd"
+- curl -sLSf "https://github.com/openfaas/faasd/releases/download/0.8.3/faasd" -o "/usr/local/bin/faasd" && chmod a+x "/usr/local/bin/faasd"
 - cd /go/src/github.com/openfaas/faasd/ && /usr/local/bin/faasd install
 - systemctl status -l containerd --no-pager
 - journalctl -u faasd-provider --no-pager
